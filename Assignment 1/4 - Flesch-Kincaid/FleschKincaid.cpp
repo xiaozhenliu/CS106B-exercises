@@ -79,29 +79,33 @@ int main() {
         /*Scenario 3: Single words*/
         
         else if ((previousToken!="\"")&&((previousType==WORD)||(previousType==STRING)||(previousType==NUMBER))){
-                scanner.saveToken(token);
-                token = previousToken;
-                int iSyl = countSyl(token);     //calculate syllables in this word
-                words++;                    //count as a word
+            scanner.saveToken(token);
+            token = previousToken;
+            int iSyl = countSyl(token);     //calculate syllables in this word
+            words++;                    //count as a word
             
-                cout <<"Token: ["<<token<<"]"<<" ("<<words<<"word, "<<countSyl(token)<<" syllables.)";
+            /*Display line reading information*/
+            if(iSyl!=1) cout <<"Token: ["<<token<<"]"<<" (word, "<<iSyl<<" syllables.)";
+            else cout <<"Token: ["<<token<<"]"<<" (word, "<<iSyl<<" syllable.)";
                 syl=syl+iSyl;               //count total number of syllables
         }
-            /*Scenario 4: Punctuates and scentences*/
-        else{
-                scanner.saveToken(token);
-                token = previousToken;
-                cout <<"Token: ["<<token<<"]";
-                if ((token == ".")||(token =="?")||(token=="!")){
-                    cout <<"(End of a sentence)";
-                    stc++;
-
-                }
+        
+        /*Scenario 4: Punctuates and scentences*/
+        else {
+            scanner.saveToken(token);
+            token = previousToken;
+            cout <<"Token: ["<<token<<"]";
+            if ((token == ".")||(token =="?")||(token=="!")){
+                cout <<"(End of a sentence)";
+                stc++;
             }
+        }
+        
         token= scanner.nextToken();
-
         cout<<endl;
     }
+    
+    /*Last token*/
     if((token == ".")||(token =="?")||(token=="!")){
         cout <<"Token: ["<<token<<"]";
         cout <<"(End of a sentence and the file)"<<endl;
@@ -118,24 +122,35 @@ int main() {
     cout <<"Grade Level: "<<gLevel<<endl;
     return 0;
 }
+
+/*function for counting syllables*/
 int countSyl(string token){
     int iSyl =0;
     int L = token.length()-1;
-    if(L==1) iSyl = 1;
+    
+    if((L==0)||(L==1)) iSyl = 1; //for short words
+    
     else {
-        for (int i=0;i<L;i++){
-            if((isVowel(token[i]))&&(!isVowel(token[i+1]))) iSyl++;
-            else if ((isVowel(token[i]))&&(isVowel(token[i+1]))) {
+        for (int i=0;i<=L;i++){
+            if(isVowel(token[i])) {
                 iSyl++;
-                i++;
+                
+                //if two vowels present together, skip the 2nd one
+                if(isVowel(token[i+1])) i++;
             }
         }
-        if (token[L]=='e'&&(!isVowel(token[L-1])))iSyl--;
+        if (token[0]=='y') iSyl--; //"y" at the beginning
+        
+        //"e" at the end
+        if ((token[L]=='e')&&(!isVowel(token[L-1])))iSyl--;
+        //a word should have at least 1 syllable
         if (iSyl<1) iSyl = 1;
     }
     return iSyl;
 }
+
+/*function for determine if a char is a vowel*/
 bool isVowel(char ch){
-    if ((ch =='a')||(ch=='e')||(ch=='i')||(ch=='o')||(ch=='u')||(ch=='y')) return true;
+    if ((ch=='a')||(ch=='e')||(ch=='i')||(ch=='o')||(ch=='u')||(ch=='y')) return true;
     else return false;
 }
